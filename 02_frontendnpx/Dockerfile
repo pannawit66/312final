@@ -1,23 +1,25 @@
-# ใช้ Node.js เวอร์ชั่น 18 แบบเล็ก (Alpine)
+# ใช้ Node.js เป็นฐาน
 FROM node:18-alpine
 
-# กำหนดโฟลเดอร์ทำงานใน Container
+# กำหนดโฟลเดอร์ทำงาน
 WORKDIR /app
 
-# ก๊อปปี้ไฟล์ package.json ไปก่อนเพื่อลงโปรแกรม
-COPY package*.json ./
+# รับค่า Argument ตอน Build (เพื่อเชื่อมต่อ API)
+ARG API_HOST
+ENV NEXT_PUBLIC_API_HOST=$API_HOST
 
-# ติดตั้ง Dependencies
+# ก๊อปปี้ไฟล์ package.json มาลง dependencies
+COPY package*.json ./
 RUN npm install
 
-# ก๊อปปี้โค้ดทั้งหมดตามไป
+# ก๊อปปี้โค้ดทั้งหมด
 COPY . .
 
-# สั่ง Build เว็บ (สำหรับ Production)
+# สั่ง Build เว็บ (Next.js ต้อง Build ก่อน Run)
 RUN npm run build
 
 # เปิด Port 3000
 EXPOSE 3000
 
-# คำสั่งรันเมื่อเริ่ม Container
+# คำสั่งรันเว็บ
 CMD ["npm", "start"]
